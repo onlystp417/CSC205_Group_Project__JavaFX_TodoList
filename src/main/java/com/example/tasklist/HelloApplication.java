@@ -39,7 +39,8 @@ public class HelloApplication extends Application {
         root.setTop(buildTop());
         root.setCenter(buildTabs());
 
-        tabPane.getSelectionModel().select(undoneTab);
+        // select the default tab - allTab
+        tabPane.getSelectionModel().select(allTab);
         refreshTabContent();
 
         stage.setTitle("Todo List");
@@ -59,6 +60,7 @@ public class HelloApplication extends Application {
                 } else {
                     Task newTask = new Task(taskName, false);
                     tasks.add(newTask);
+                    tabPane.getSelectionModel().select(allTab); // when add tab, re-initialize the default tab - addTab
                     refreshTabContent();
                     taskInput.clear();
                 }
@@ -80,7 +82,6 @@ public class HelloApplication extends Application {
         doneTab.setClosable(false);
         undoneTab.setClosable(false);
 
-        tabPane.getSelectionModel().select(allTab);
         EventHandler<Event> tabEventHandler = new EventHandler<Event>() {
             @Override
             public void handle(Event event) {
@@ -169,7 +170,7 @@ public class HelloApplication extends Application {
     private void refreshTabContent() {
         Tab selectedTab = tabPane.getSelectionModel().getSelectedItem();
         if (selectedTab == allTab) {
-            allTab.setContent(createTaskListView(filteredTasks.filtered(task -> true))); // 顯示所有任務
+            allTab.setContent(createTaskListView(filteredTasks.filtered(task -> true)));
         } else if (selectedTab == doneTab) {
             doneTab.setContent(createTaskListView(filteredTasks.filtered(task -> task.getCompleted())));
         } else if (selectedTab == undoneTab) {
