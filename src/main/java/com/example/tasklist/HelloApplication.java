@@ -126,19 +126,23 @@ public class HelloApplication extends Application {
             if (empty || task == null) {
                 setText(null);
             } else {
-                HBox taskNode = new HBox();
-                HBox taskLabel;
-                Button deleteBtn;
-                Pane spacer = new Pane();
-                HBox.setHgrow(spacer, Priority.ALWAYS);
-                spacer.setMinSize(10, 1);
-
-                taskLabel = buildTaskLabel(task);
-                deleteBtn = buildDeleteBtn(task);
-
-                taskNode.getChildren().addAll(taskLabel, spacer, deleteBtn);
-                setGraphic(taskNode);
+                setGraphic(generateTaskNode(task));
             }
+        }
+
+        private HBox generateTaskNode (Task task) {
+            HBox taskNode = new HBox();
+            HBox taskLabel;
+            Button deleteBtn;
+            Pane spacer = new Pane();
+            HBox.setHgrow(spacer, Priority.ALWAYS);
+            spacer.setMinSize(10, 1);
+
+            taskLabel = buildTaskLabel(task);
+            deleteBtn = buildDeleteBtn(task);
+
+            taskNode.getChildren().addAll(taskLabel, spacer, deleteBtn);
+            return taskNode;
         }
 
         private Button buildDeleteBtn(Task task) {
