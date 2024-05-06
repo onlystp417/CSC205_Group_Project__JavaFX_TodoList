@@ -26,7 +26,6 @@ public class HelloApplication extends Application {
 
     private ObservableList<Task> tasks = FXCollections.observableArrayList();
     private FilteredList<Task> filteredTasks;
-    private ListView<Task> taskListView = new ListView<>();
     private TabPane tabPane;
     private Tab allTab, doneTab, undoneTab;
 
@@ -36,11 +35,12 @@ public class HelloApplication extends Application {
         Scene scene = new Scene(root, 350, 600);
 
         filteredTasks = new FilteredList<>(tasks);
-        taskListView.setItems(filteredTasks);
-        taskListView.setCellFactory(param -> new TaskCell());
 
         root.setTop(buildTop());
         root.setCenter(buildTabs());
+
+        tabPane.getSelectionModel().select(undoneTab);
+        refreshTabContent();
 
         stage.setTitle("Todo List");
         stage.setScene(scene);
@@ -59,6 +59,7 @@ public class HelloApplication extends Application {
                 } else {
                     Task newTask = new Task(taskName, false);
                     tasks.add(newTask);
+                    refreshTabContent();
                     taskInput.clear();
                 }
             }
@@ -80,34 +81,23 @@ public class HelloApplication extends Application {
         undoneTab.setClosable(false);
 
         tabPane.getSelectionModel().select(allTab);
-
-        allTab.setOnSelectionChanged(new EventHandler<Event>() {
+        EventHandler<Event> tabEventHandler = new EventHandler<Event>() {
             @Override
             public void handle(Event event) {
-                allTab.setContent(createTaskListView(filteredTasks));
+                refreshTabContent();
             }
-        });
+        };
 
-        doneTab.setOnSelectionChanged(new EventHandler<Event>() {
-            @Override
-            public void handle(Event event) {
-                doneTab.setContent(createTaskListView(filteredTasks.filtered(task -> task.getCompleted())));
-            }
-        });
-
-        undoneTab.setOnSelectionChanged(new EventHandler<Event>() {
-            @Override
-            public void handle(Event event) {
-                undoneTab.setContent(createTaskListView(filteredTasks.filtered(task -> !task.getCompleted())));
-            }
-        });
+        allTab.setOnSelectionChanged(tabEventHandler);
+        doneTab.setOnSelectionChanged(tabEventHandler);
+        undoneTab.setOnSelectionChanged(tabEventHandler);
 
         tabPane.getTabs().addAll(allTab, doneTab, undoneTab);
 
         return tabPane;
     }
 
-    private ListView<Task> createTaskListView(ObservableList<Task> list) {
+    private ListView<Task> createTaskListView(FilteredList<Task> list) {
         ListView<Task> listView = new ListView<>();
         listView.setItems(list);
         listView.setCellFactory(param -> new TaskCell());
@@ -146,7 +136,6 @@ public class HelloApplication extends Application {
                 deleteBtn = buildDeleteBtn(task);
 
                 taskNode.getChildren().addAll(taskLabel, spacer, deleteBtn);
-//                taskNode.getChildren().addAll(taskLabel, spacer);
                 setGraphic(taskNode);
             }
         }
@@ -156,8 +145,7 @@ public class HelloApplication extends Application {
             deleteBtn.setStyle("-fx-color: #cf3d34");
             deleteBtn.setOnAction(event -> {
                 tasks.remove(task);
-                filteredTasks.setPredicate(t -> true);
-//                tabPane.getSelectionModel().select(tabPane.getSelectionModel().getSelectedItem());
+                refreshTabContent();
             });
             return deleteBtn;
         }
@@ -175,6 +163,17 @@ public class HelloApplication extends Application {
             taskLable.getChildren().addAll(checkBox, name);
             taskLable.setAlignment(Pos.CENTER);
             return taskLable;
+        }
+    }
+
+    private void refreshTabContent() {
+        Tab selectedTab = tabPane.getSelectionModel().getSelectedItem();
+        if (selectedTab == allTab) {
+            allTab.setContent(createTaskListView(filteredTasks.filtered(task -> true))); // 顯示所有任務
+        } else if (selectedTab == doneTab) {
+            doneTab.setContent(createTaskListView(filteredTasks.filtered(task -> task.getCompleted())));
+        } else if (selectedTab == undoneTab) {
+            undoneTab.setContent(createTaskListView(filteredTasks.filtered(task -> !task.getCompleted())));
         }
     }
 
