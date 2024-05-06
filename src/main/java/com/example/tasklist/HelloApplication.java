@@ -18,6 +18,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 
 import javafx.event.Event;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import java.io.IOException;
 import java.lang.Exception;
@@ -52,20 +53,25 @@ public class HelloApplication extends Application {
         TextField taskInput = new TextField();
         Button submitBtn = new Button("Add Task");
 
-        submitBtn.setOnAction(e -> {
-            String taskName = taskInput.getText().trim();
-            if (!taskName.isEmpty()) {
-                if (isTaskDuplicate(taskName)) {
-                    showAlert("Task is duplicated!");
-                } else {
-                    Task newTask = new Task(taskName, false);
-                    tasks.addFirst(newTask);
-                    tabPane.getSelectionModel().select(allTab); // when add tab, re-initialize the default tab - addTab
-                    refreshTabContent();
-                    taskInput.clear();
-                }
+        EventHandler<ActionEvent> submitEvent = new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                    String taskName = taskInput.getText().trim();
+                    if (!taskName.isEmpty()) {
+                        if (isTaskDuplicate(taskName)) {
+                            showAlert("Task is duplicated!");
+                        } else {
+                            Task newTask = new Task(taskName, false);
+                            tasks.addFirst(newTask);
+                            tabPane.getSelectionModel().select(allTab); // when add tab, re-initialize the default tab - addTab
+                            refreshTabContent();
+                            taskInput.clear();
+                        }
+                    }
             }
-        });
+        };
+
+        submitBtn.setOnAction(submitEvent);
 
         HBox hBox = new HBox(10, taskInput, submitBtn);
         hBox.setPadding(new Insets(10));
