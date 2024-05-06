@@ -59,7 +59,7 @@ public class HelloApplication extends Application {
                     showAlert("Task is duplicated!");
                 } else {
                     Task newTask = new Task(taskName, false);
-                    tasks.add(newTask);
+                    tasks.addFirst(newTask);
                     tabPane.getSelectionModel().select(allTab); // when add tab, re-initialize the default tab - addTab
                     refreshTabContent();
                     taskInput.clear();
@@ -159,11 +159,15 @@ public class HelloApplication extends Application {
             HBox taskLable = new HBox();
             Text name = new Text(task.getName());
             CheckBox checkBox = new CheckBox();
+
+            name.setStrikethrough(task.getCompleted());
             checkBox.setSelected(task.getCompleted());
+
             checkBox.setOnAction(event -> {
                 task.setCompleted(!task.getCompleted());
                 name.setStrikethrough(task.getCompleted());
             });
+
             taskLable.setSpacing(5);
             taskLable.getChildren().addAll(checkBox, name);
             taskLable.setAlignment(Pos.CENTER);
