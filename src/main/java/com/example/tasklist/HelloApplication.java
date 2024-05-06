@@ -26,7 +26,8 @@ import java.lang.Exception;
 public class HelloApplication extends Application {
 
     private ObservableList<Task> tasks = FXCollections.observableArrayList();
-    private FilteredList<Task> filteredTasks;
+    private FilteredList<Task> filteredTasks = new FilteredList<>(tasks);
+
     private TabPane tabPane;
     private Tab allTab, doneTab, undoneTab;
 
@@ -34,8 +35,6 @@ public class HelloApplication extends Application {
     public void start(Stage stage) throws IOException {
         BorderPane root = new BorderPane();
         Scene scene = new Scene(root, 350, 600);
-
-        filteredTasks = new FilteredList<>(tasks);
 
         root.setTop(buildTop());
         root.setCenter(buildTabs());
